@@ -1,0 +1,29 @@
+---
+- name: Configuración de máquina virtual en Azure y despliegue de imagen Docker
+  hosts: all
+  tasks:
+    - name: Instalar Docker en la máquina virtual
+      become: true
+      apt: name={{ item }} state=present update_cache=yes
+      loop: ["docker.io", "python3-pip"]
+
+    - name: Descargar python libreria docker 
+      become: true
+      pip: 
+        name: docker
+       
+
+    - name: Descargar imagen Docker desde Docker Hub
+      become: true
+      docker_image:
+        name: denalyn/3ec209b14b97
+        source: pull
+
+    - name: Ejecutar contenedor Docker
+      become: true
+      docker_container:
+        name:  frontend
+        image: denalyn/3ec209b14b97
+        state: started
+        ports:
+          - 80:3000
